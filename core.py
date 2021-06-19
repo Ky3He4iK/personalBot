@@ -80,7 +80,7 @@ def main():
             pass_chat_data=True
         ))
     updater.dispatcher.add_error_handler(error_handler)
-    with TelegramClient('name', secret_constants.api_id, secret_constants.api_hash) as client:
+    with TelegramClient('personal', secret_constants.api_id, secret_constants.api_hash) as client:
         init_handers()
         main_functions.init_state()
 
