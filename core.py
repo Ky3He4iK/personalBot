@@ -1,7 +1,8 @@
 import logging
 from time import sleep
 import importlib
-from typing import Dict
+from typing import Dict, Tuple
+from types import ModuleType
 
 from telegram.ext import Updater, CommandHandler, Filters
 from telethon.sync import TelegramClient
@@ -15,7 +16,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     filename="personal.log")
 updater = None
 client = None
-loaded_modules: Dict[str, BaseModule.BaseModule] = {}
+loaded_modules: Dict[str, Tuple[ModuleType, BaseModule.BaseModule]] = {}
 states = {}
 
 
@@ -24,14 +25,14 @@ def init_handers():
         if 1 in updater.dispatcher.handlers:
             for handler in updater.dispatcher.handlers[1]:
                 updater.dispatcher.remove_handler(handler, group=1)
-        for module in loaded_modules.values():
-            for handler in module.get_bot_handlers():
+        for module, instance in loaded_modules.values():
+            for handler in instance.get_bot_handlers():
                 updater.dispatcher.add_handler(handler, group=1)
     if isinstance(client, TelegramClient):
         for handler, event in client.list_event_handlers():
             client.remove_event_handler(handler, event)
-        for module in loaded_modules.values():
-            for event, handler in module.get_user_handlers().items():
+        for module, instance in loaded_modules.values():
+            for event, handler in instance.get_user_handlers().items():
                 client.add_event_handler(handler, event)
 
 
@@ -42,14 +43,15 @@ def reload_handler(update, _):
         new_loaded = module_list.read().splitlines()
 
     error_text = ""
-    for name, module in loaded_modules.items():
-        states[name] = module.save_state()
+    for name, (module, instance) in loaded_modules.items():
+        states[name] = instance.save_state()
         if name in new_loaded:
             try:
                 importlib.reload(module)
-                module = __import__(name).module(client)
-                module.load_state(states[name], client)
-                loaded_modules[name] = module
+                module = __import__(name)
+                instance = module.module(client)
+                instance.load_state(states[name], client)
+                loaded_modules[name] = (module, instance)
             except BaseException as e:
                 error_text += f"\nFailed to load module {name}: {e}"
         else:
@@ -59,8 +61,9 @@ def reload_handler(update, _):
     for name in new_loaded:
         if name not in loaded_modules:
             try:
-                module = __import__(name).module(client)
-                loaded_modules[name] = module
+                module = __import__(name)
+                instance = module.module(client)
+                loaded_modules[name] = (module, instance)
             except BaseException as e:
                 error_text += f"\nFailed to load module {name}: {e}"
     init_handers()

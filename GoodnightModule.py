@@ -24,8 +24,7 @@ class GoodnightModule(BaseModule):
         )
 
     async def goodnight_handler(self, event):
-        send_to = {config_file.cutie_id: 'Данночка', config_file.channel_id: 'подписчики',
-                   -1001444301389: 'чатик', -1001282562260: 'чатик'}
+        send_to = {config_file.channel_id: 'подписчики', -1001444301389: 'чатик', -1001282562260: 'чатик'}
         text = event.message.text
         if text.endswith(', чатик'):
             text = text[:text.rfind(', ')]
