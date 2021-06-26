@@ -2,3 +2,4 @@ BiteModule
 StartModule
 MediaSaverModule
 GoodnightModule
+ChatlistModule
