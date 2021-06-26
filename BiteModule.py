@@ -16,6 +16,10 @@ class BiteModule(BaseModule):
         ]
 
     @staticmethod
+    def get_module_info() -> str:
+        return "Кусь"
+
+    @staticmethod
     def bite_handler(update, context):
         if update.message.chat_id == config_file.master_id or update.message.from_user.id == config_file.master_id:
             context.bot.send_message(config_file.cutie_id, update.message.text)

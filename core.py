@@ -83,6 +83,11 @@ def shutdown_handler(update, _):
     exit(0)
 
 
+def modules_handler(update, _):
+    text = '\n'.join(f'{name}: {instance.get_module_info()}' for name, (module, instance) in loaded_modules.values())
+    update.message.reply_text(text)
+
+
 # log all errors
 def error_handler(update, context):
     logger.error('Error: {} ({} {}) caused.by {}'.format(context, type(context.error), context.error, update))

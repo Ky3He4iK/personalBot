@@ -18,12 +18,17 @@ class GoodnightModule(BaseModule):
         }
 
     @staticmethod
+    def get_module_info() -> str:
+        return "Перенаправляет сообщения 'Спокойной ночи, чатик' и 'Утречка' в другие каналы и чаты"
+
+    @staticmethod
     def goodnight_filter(event):
         return event.message.photo is not None and (
                 event.message.text.startswith('Утречка') or event.message.text.startswith('Спокойной ночи')
         )
 
     async def goodnight_handler(self, event):
+        # todo: configurable list of receivers
         send_to = {config_file.channel_id: 'подписчики', -1001444301389: 'чатик', -1001282562260: 'чатик'}
         text = event.message.text
         if text.endswith(', чатик'):

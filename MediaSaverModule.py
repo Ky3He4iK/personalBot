@@ -7,6 +7,7 @@ class MediaSaverModule(BaseModule):
     def __init__(self, client: TelegramClient):
         super().__init__(client)
         self.event_media_saver = events.NewMessage(func=lambda e: e.chat_id in [-1001444301389, -1001282562260])
+        # todo: configurable sources
 
     def get_user_handlers(self) -> dict:
         return {
@@ -14,10 +15,8 @@ class MediaSaverModule(BaseModule):
         }
 
     @staticmethod
-    def goodnight_filter(event):
-        return event.message.photo is not None and (
-                event.message.text.startswith('Утречка') or event.message.text.startswith('Спокойной ночи')
-        )
+    def get_module_info() -> str:
+        return "Save all media to specific channel"
 
     async def media_saver_handler(self, event: events.NewMessage):
         fields = ['audio', 'document', 'file', 'photo', 'video', 'video_note', 'voice']

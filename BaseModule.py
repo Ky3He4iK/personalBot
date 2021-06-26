@@ -1,7 +1,8 @@
+import abc
 from telethon import TelegramClient
 
 
-class BaseModule:
+class BaseModule(abc.ABC):
     """
         Init module
     """
@@ -32,6 +33,14 @@ class BaseModule:
     """
     def get_user_handlers(self) -> dict:
         return {}
+
+    """
+        Get string that describes this module. Shown to master
+    """
+    @staticmethod
+    @abc.abstractmethod
+    def get_module_info() -> str:
+        pass
 
 
 """ To use module create class named `module` that inherits BaseModule like this: """
