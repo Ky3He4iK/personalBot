@@ -17,11 +17,11 @@ class ChatlistModule(BaseModule):
 
     @staticmethod
     def get_module_info() -> str:
-        return "/chats - list all chats"
+        return "/chats - list all chats\n/chats N - list first N chats"
 
-    async def get_dialogs(self):
+    async def get_dialogs(self, limit=None):
         res = ""
-        for dialog in self.client.iter_dialogs():
+        async for dialog in self.client.iter_dialogs(limit=limit):
             res += f"\n`{dialog.id}`: {self.escape_markdown_v2(str(dialog.title))}"
         return res
 
@@ -43,8 +43,20 @@ class ChatlistModule(BaseModule):
         return list(done)[0].result()
 
     def chats_handler(self, update, _):
-        dialogs = self.run_async(self.get_dialogs)
-        update.message.reply_text(dialogs, parse_mode=ParseMode.MARKDOWN_V2)
+        if ' ' in update.message.text:
+            limit = int(update.message.text.split(' ')[1])
+        else:
+            limit = None
+        text = self.run_async(self.get_dialogs(limit))
+        while len(text) > 4095:
+            last = text[:4096].rfind('\n')
+            if last == -1:
+                update.message.reply_text(text[:4092] + '...', parse_mode=ParseMode.MARKDOWN_V2)
+                text = text[4092:]
+            else:
+                update.message.reply_text(text[:last])
+                text = text[last + 1:]
+            update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN_V2)
 
 
 module = ChatlistModule

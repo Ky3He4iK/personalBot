@@ -84,7 +84,7 @@ def shutdown_handler(update, _):
 
 
 def modules_handler(update, _):
-    text = '\n'.join(f'{name}: {instance.get_module_info()}' for name, (module, instance) in loaded_modules.items())
+    text = '\n\n'.join(f'{name}:\n{instance.get_module_info()}' for name, (module, instance) in loaded_modules.items())
     update.message.reply_text(text)
 
 
