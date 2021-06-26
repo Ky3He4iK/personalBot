@@ -34,7 +34,11 @@ class ChatlistModule(BaseModule):
 
     @staticmethod
     def run_async(task):
-        loop = asyncio.get_event_loop()
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
         done, pending = loop.run_until_complete(asyncio.wait([task]))
         return list(done)[0].result()
 
