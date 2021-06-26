@@ -105,6 +105,7 @@ def main():
     master_commands = {
         'reload': reload_handler,
         'shutdown': shutdown_handler,
+        'modules': modules_handler,
     }
     for cmd, handler in master_commands.items():
         updater.dispatcher.add_handler(CommandHandler(
